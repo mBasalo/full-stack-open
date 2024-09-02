@@ -1,5 +1,24 @@
 import { useState } from "react";
 
+//STATICS COMPONENT 
+
+const Statistics = ({ good, neutral, bad, total, average, positivePercentage }) => {
+  if (total === 0) {
+    return <p>No feedback given</p>;
+  }
+
+  return (
+    <>
+      <p>good: {good}</p>
+      <p>neutral: {neutral}</p>
+      <p>bad: {bad}</p>
+      <p>total: {total}</p>
+      <p>average: {average.toFixed(2)}</p>
+      <p>positive feedback: {positivePercentage.toFixed(2)}%</p>
+    </>
+  );
+};
+
 const App = () => {
   const [good, setGood] = useState(0);
   const [neutral, setNeutral] = useState(0);
@@ -12,7 +31,6 @@ const App = () => {
   const total = good + neutral + bad;
   const average = total > 0 ? (good - bad) / total : 0; 
   const positivePercentage = total > 0 ? (good / total) * 100 : 0;
-
 
 
   const handleReset = () => {
@@ -31,7 +49,7 @@ const App = () => {
 
       <h2>statistics</h2>
 
-      <p>good: {good}</p>
+      {/* <p>good: {good}</p>
       <p>neutral: {neutral}</p>
       <p>bad: {bad}</p>
       <br />
@@ -39,7 +57,16 @@ const App = () => {
       <p>total: {total}</p>
       <p>average: {average.toFixed(2)}</p>
       <p>positive feedback: {positivePercentage.toFixed(2)}%</p>
-      <br />
+      <br /> */}
+
+<Statistics
+        good={good}
+        neutral={neutral}
+        bad={bad}
+        total={total}
+        average={average}
+        positivePercentage={positivePercentage}
+      />
 
       <button onClick={handleReset}>reset</button>
     </>
