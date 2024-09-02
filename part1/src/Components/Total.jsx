@@ -1,4 +1,7 @@
 const Total = ({ parts }) => {
+
+  console.log(parts);
+  
   let totalExercises = 0;
 
   parts.forEach(part => {
