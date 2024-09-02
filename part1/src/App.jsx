@@ -63,6 +63,10 @@ const App = () => {
     const randomIndex = Math.floor(Math.random() * anecdotes.length);
     setSelected(randomIndex);
   };
+
+
+  const maxVotes = Math.max(...votes);
+  const topAnecdoteIndex = votes.indexOf(maxVotes);
   // const [good, setGood] = useState(0);
   // const [neutral, setNeutral] = useState(0);
   // const [bad, setBad] = useState(0);
@@ -75,10 +79,21 @@ const App = () => {
     <>
 
 <div>
+      <h1>Anecdote of the day</h1>
       <p>{anecdotes[selected]}</p>
       <p>has {votes[selected]} votes</p>
       <button onClick={handleVote}>Vote</button>
       <button onClick={handleNextAnecdote}>Next Anecdote</button>
+
+      <h2>Anecdote with most votes</h2>
+      {maxVotes > 0 ? (
+        <>
+          <p>{anecdotes[topAnecdoteIndex]}</p>
+          <p>has {maxVotes} votes</p>
+        </>
+      ) : (
+        <p>No votes yet</p>
+      )}
     </div>
       {/* <h1>give feedback</h1> */}
 
