@@ -4,10 +4,17 @@ const Content = ({ parts }) => {
 
     console.log("this is the array parts:", parts);
 
-    
-    
 
     const totalExercises = parts.reduce((sum, part) => sum + part.exercises, 0)
+
+//    const total = 
+//     parts.reduce((suma, parte) => {
+//         return suma + parte.id
+// }        , 0
+// )
+
+
+
 
 
   return (
