@@ -3,8 +3,8 @@ import Content from './Content'
 
 const Course = ({ course }) => {
 
-  console.log(course);
-  console.log("hola mundo");
+  // console.log(course);
+  // console.log("hola mundo");
 
 
   

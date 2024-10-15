@@ -2,7 +2,7 @@ import Part from './Part'
 
 const Content = ({ parts }) => {
 
-    console.log("this is the array parts:", parts);
+    // console.log("this is the array parts:", parts);
 
 
     const totalExercises = parts.reduce((sum, part) => sum + part.exercises, 0)
