@@ -96,87 +96,79 @@
   //   <button type="submit">save</button>
   // </form>  
   import { useState } from 'react'
+import PersonForm from './2.10/PersonForm'
+import Filter from './2.10/Filter'
+import Persons from './2.10/Persons'
 
-  const App = () => {
-    const [persons, setPersons] = useState([
-      { name: 'Arto Hellas', phone: '040-123456', id: 1 },
-      { name: 'Ada Lovelace', phone: '39-44-5323523', id: 2 },
-      { name: 'Dan Abramov', phone: '12-43-234345', id: 3 },
-      { name: 'Mary Poppendieck', phone: '39-23-6423122', id: 4 }
-    ]) 
-    const [newName, setNewName] = useState('')
-    const [newPhone, setNewPhone] = useState('')
-    const [searchTerm, setSearchTerm] = useState('')
-  
-    const handleNameChange = (event) => {
-      setNewName(event.target.value)
-    }
-  
-    const handlePhoneChange = (event) => {
-      setNewPhone(event.target.value)
-    }
-  
-    const handleSearchChange = (event) => {
-      setSearchTerm(event.target.value)
-    }
-  
-    // Agrega una nueva persona
-    const addPerson = (event) => {
-      event.preventDefault()
-  
-      const nameExists = persons.some(person => person.name === newName)
-      const phoneExists = persons.some(person => person.phone === newPhone)
-  
-      if (nameExists) {
-        alert(`${newName} is already added to phonebook`)
-      } else if (phoneExists) {
-        alert(`Phone number ${newPhone} is already added to phonebook`)
-      } else {
-        const newPerson = { name: newName, phone: newPhone }
-        setPersons(persons.concat(newPerson))
-        setNewName('')
-        setNewPhone('')
-      }
-    }
-  
-    // Filtrar personas según el término de búsqueda (insensible a mayúsculas/minúsculas)
-    const personsToShow = persons.filter(person =>
-      person.name.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-  
-    return (
-      <div>
-        <h2>Phonebook</h2>
-  
-        {/* Campo de búsqueda */}
-        <div>
-          Search: <input value={searchTerm} onChange={handleSearchChange} />
-        </div>
-  
-        {/* Formulario para agregar una nueva persona */}
-        <form onSubmit={addPerson}>
-          <div>
-            name: <input value={newName} onChange={handleNameChange} />
-          </div>
-          <div>
-            phone: <input value={newPhone} onChange={handlePhoneChange} />
-          </div>
-          <div>
-            <button type="submit">add</button>
-          </div>
-        </form>
-  
-        <h2>Numbers</h2>
-        <ul>
-          {personsToShow.map((person, index) => (
-            <li key={index}>{person.name} {person.phone}</li>
-          ))}
-        </ul>
-      </div>
-    )
+const App = () => {
+  const [persons, setPersons] = useState([
+    { name: 'Arto Hellas', phone: '040-123456', id: 1 },
+    { name: 'Ada Lovelace', phone: '39-44-5323523', id: 2 },
+    { name: 'Dan Abramov', phone: '12-43-234345', id: 3 },
+    { name: 'Mary Poppendieck', phone: '39-23-6423122', id: 4 }
+  ]) 
+  const [formData, setFormData] = useState({
+    newName: '',
+    newPhone: '',
+    searchTerm: ''
+  })
+
+  // Maneja los cambios en el input
+  const handleInputChange = (event) => {
+    const { name, value } = event.target
+    setFormData({
+      ...formData,
+      [name]: value
+    })
   }
-  
-  export default App
-  
+
+  // Agrega una nueva persona
+  const addPerson = (event) => {
+    event.preventDefault()
+
+    const nameExists = persons.some(person => person.name === formData.newName)
+    const phoneExists = persons.some(person => person.phone === formData.newPhone)
+
+    if (nameExists) {
+      alert(`${formData.newName} is already added to phonebook`)
+    } else if (phoneExists) {
+      alert(`Phone number ${formData.newPhone} is already added to phonebook`)
+    } else {
+      const newPerson = { name: formData.newName, phone: formData.newPhone }
+      setPersons(persons.concat(newPerson))
+      setFormData({ ...formData, newName: '', newPhone: '' }) // Limpiamos los campos
+    }
+  }
+
+  // Filtrar personas según el término de búsqueda (insensible a mayúsculas/minúsculas)
+  const personsToShow = persons.filter(person =>
+    person.name.toLowerCase().includes(formData.searchTerm.toLowerCase())
+  )
+
+  return (
+    <div>
+      <h2>Phonebook</h2>
+
+      <Filter searchTerm={formData.searchTerm} handleInputChange={handleInputChange} />
+
+      <h3>Add a new</h3>
+
+      <PersonForm
+        newName={formData.newName}
+        newPhone={formData.newPhone}
+        handleInputChange={handleInputChange}
+        addPerson={addPerson}
+      />
+
+      <h3>Numbers</h3>
+
+      <Persons persons={personsToShow} />
+    </div>
+  )
+}
+
+export default App
+
+
   
   
