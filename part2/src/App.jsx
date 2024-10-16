@@ -99,26 +99,36 @@
 
   const App = () => {
     const [persons, setPersons] = useState([
-      { name: 'Arto Hellas' }
+      { name: 'Arto Hellas',
+        phone: '123123'
+       }
     ]) 
     const [newName, setNewName] = useState('')
-  
+    const [newPhone, setNewPhone] = useState('')
+
+   
     const handleNameChange = (event) => {
       setNewName(event.target.value)
+    }
+
+    const handlePhoneChange = (event) => {
+      setNewPhone(event.target.value)
     }
   
     const addPerson = (event) => {
       event.preventDefault() 
 
       const nameExists = persons.some(person => person.name === newName)
+      const phoneExists = persons.some(person => person.phone === newPhone)
 
       if (nameExists) {
-        alert(`${newName} is already added to phonebook`)
+        alert(`${newName} or ${newPhone} is already added to phonebook`)
       } else {
 
-      const newPerson = { name: newName }
+      const newPerson = { name: newName, phone: newPhone }
       setPersons(persons.concat(newPerson)) 
-      setNewName('') }
+      setNewName('')
+      setNewPhone('') }
 
 
     }
@@ -130,6 +140,12 @@
           <div>
             name: <input value={newName} onChange={handleNameChange} />
           </div>
+
+          <div>
+            phone: <input valuse={newPhone} onChange={handlePhoneChange} />
+          </div>
+
+
           <div>
             <button type="submit">add</button>
           </div>
@@ -137,7 +153,7 @@
         <h2>Numbers</h2>
         <ul>
           {persons.map((person, index) => (
-            <li key={index}>{person.name}</li>
+            <li key={index}>{person.name + " " + person.phone}</li>
           ))}
         </ul>
       </div>
