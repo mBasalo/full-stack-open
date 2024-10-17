@@ -1,119 +1,85 @@
-// import Course from './Components/Course'
+// import { useState, useEffect } from 'react'
+// import axios from 'axios'
 // import Note from './Components/Note'
 
-  // const courses = [
-  //   {
-  //     name: 'Half Stack application development',
-  //     id: 1,
-  //     parts: [
-  //       {
-  //         name: 'Fundamentals of React',
-  //         exercises: 10,
-  //         id: 1
-  //       },
-  //       {
-  //         name: 'Using props to pass data',
-  //         exercises: 7,
-  //         id: 2
-  //       },
-  //       {
-  //         name: 'State of a component',
-  //         exercises: 14,
-  //         id: 3
-  //       },
-  //       {
-  //         name: 'Redux',
-  //         exercises: 11,
-  //         id: 4
-  //       }
-  //     ]
-  //   }, 
-  //   {
-  //     name: 'Node.js',
-  //     id: 2,
-  //     parts: [
-  //       {
-  //         name: 'Routing',
-  //         exercises: 3,
-  //         id: 1
-  //       },
-  //       {
-  //         name: 'Middlewares',
-  //         exercises: 7,
-  //         id: 2
-  //       }
-  //     ]
-  //   }
-  // ]
+// const App = () => {
+//   const [notes, setNotes] = useState([])
+//   const [newNote, setNewNote] = useState('')
+//   const [showAll, setShowAll] = useState(false)
 
-  // console.log(props);
+//   useEffect(() => {
+//     axios
+//       .get('http://localhost:3001/notes')
+//       .then(response => {
+//         setNotes(response.data)
+//       })
+//   }, [])
+
+//   const addNote = (event) => {
+//     event.preventDefault()
+//     const noteObject = {
+//       content: newNote,
+//       important: Math.random() > 0.5,
+//       id: notes.length + 1,
+//     }
   
+//     setNotes(notes.concat(noteObject))
+//     setNewNote('')
+//   }
 
-  // const initialNotes = [
-  //   { id: 1, title: "html is easy" },
-  //   { id: 2, title: "browser blalblal" },
-  //   { id: 3, title: "Get blalblalb" }
-  // ]
+//   const handleNoteChange = (event) => {
+//     setNewNote(event.target.value)
+//   }
 
-  // const [notes, setNotes] = useState([])
+//   const notesToShow = showAll
+//     ? notes
+//     : notes.filter(note => note.important)
 
-  // const [newNote, setNewNote] = useState(
-  //   'a new note...'
-  // ) 
+//   return (
+//     <div>
+//       <h1>Notes</h1>
+//       <div>
+//         <button onClick={() => setShowAll(!showAll)}>
+//           show {showAll ? 'important' : 'all' }
+//         </button>
+//       </div>      
+//       <ul>
+//         {notesToShow.map(note => 
+//           <Note key={note.id} note={note} />
+//         )}
+//       </ul>
+//       <form onSubmit={addNote}>
+//       <input
+//           value={newNote}
+//           onChange={handleNoteChange}
+//         />
+//         <button type="submit">save</button>
+//       </form> 
+//     </div>
+//   )
+// }
 
-  // const handleNoteChange = (event) => {
-  //   console.log(event.target.value)
-  //   setNewNote(event.target.value)
-  // }
+// export default App
 
-  // const addNote = (event) => {
-  //   event.preventDefault()
-  //   const noteObject = {
-  //     content: newNote,
-  //     important: Math.random() < 0.5,
-  //     id: String(notes.length + 1),
-  //   }
-  
-  //   setNotes(notes.concat(noteObject))
-  //   setNewNote('')
-  // }
 
-  // {courses.map(course => (
-  //   <Course key={course.id} course={course} />
-  // ))}
+// ------------------------------------------------------------------
 
-  // <h1>Notes</h1>
-  // <ul>
-  //   {notes.map(note => 
-  //     // Asegúrate de que la prop 'title' esté pasando correctamente
-  //     <Note key={note.id} title={note.title} />
-  //   )}
-  // </ul>
 
-  // <form onSubmit={addNote}>
-  //   <input value={newNote}           
-  //   onChange={handleNoteChange} />
-  //   <button type="submit">save</button>
-  // </form>  
-  import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import axios from 'axios'
 import PersonForm from './2.10/PersonForm'
 import Filter from './2.10/Filter'
 import Persons from './2.10/Persons'
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', phone: '040-123456', id: 1 },
-    { name: 'Ada Lovelace', phone: '39-44-5323523', id: 2 },
-    { name: 'Dan Abramov', phone: '12-43-234345', id: 3 },
-    { name: 'Mary Poppendieck', phone: '39-23-6423122', id: 4 }
-  ]) 
+  const [persons, setPersons] = useState([])
   const [formData, setFormData] = useState({
     newName: '',
     newPhone: '',
     searchTerm: ''
   })
 
-  // Maneja los cambios en el input
+
   const handleInputChange = (event) => {
     const { name, value } = event.target
     setFormData({
@@ -122,36 +88,54 @@ const App = () => {
     })
   }
 
-  // Agrega una nueva persona
   const addPerson = (event) => {
     event.preventDefault()
 
     const nameExists = persons.some(person => person.name === formData.newName)
-    const phoneExists = persons.some(person => person.phone === formData.newPhone)
+    const phoneExists = persons.some(person => person.number === formData.newPhone)
 
     if (nameExists) {
       alert(`${formData.newName} is already added to phonebook`)
     } else if (phoneExists) {
       alert(`Phone number ${formData.newPhone} is already added to phonebook`)
     } else {
-      const newPerson = { name: formData.newName, phone: formData.newPhone }
+      const newPerson = {
+        name: formData.newName,
+        number: formData.newPhone,
+        id: persons.length + 1
+      }
       setPersons(persons.concat(newPerson))
-      setFormData({ ...formData, newName: '', newPhone: '' }) // Limpiamos los campos
+      setFormData({ ...formData, newName: '', newPhone: '' }) 
     }
   }
 
-  // Filtrar personas según el término de búsqueda (insensible a mayúsculas/minúsculas)
   const personsToShow = persons.filter(person =>
     person.name.toLowerCase().includes(formData.searchTerm.toLowerCase())
   )
+
+  useEffect(() => {
+    console.log('Fetching data from the server')
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        console.log('Data fetched successfully', response.data)
+        setPersons(response.data) 
+      })
+      .catch(error => {
+        console.error('Error fetching data', error)
+      })
+  }, []) 
 
   return (
     <div>
       <h2>Phonebook</h2>
 
-      <Filter searchTerm={formData.searchTerm} handleInputChange={handleInputChange} />
+      <Filter
+        searchTerm={formData.searchTerm}
+        handleInputChange={handleInputChange}
+      />
 
-      <h3>Add a new</h3>
+      <h3>Add a new person</h3>
 
       <PersonForm
         newName={formData.newName}
