@@ -1,9 +1,101 @@
+// import { useState, useEffect } from 'react'
+// import axios from 'axios'
+// import Note from './Components/Note'
+// import noteService from './services/notes'
+
+
+// const App = () => {
+//   const [notes, setNotes] = useState([])
+//   const [newNote, setNewNote] = useState('')
+//   const [showAll, setShowAll] = useState(false)
+
+//   useEffect(() => {
+//     noteService
+//       .getAll()
+//       .then(initialNotes => {
+//         setNotes(initialNotes)
+//       })
+//   }, [])
+
+//   const addNote = (event) => {
+//     event.preventDefault()
+//     const noteObject = {
+//       content: newNote,
+//       important: Math.random() > 0.5,
+//     }
+
+//     noteService
+//       .create(noteObject)
+//       .then(returnedNote => {
+  //         setNewNote('')
+  //       })
+  //   }
+  
+  //   const toggleImportanceOf = (id) => {
+//     const url = `http://localhost:3002/notes/${id}`
+//     const note = notes.find(n => n.id === id)
+//     const changedNote = { ...note, important: !note.important }
+
+//     console.log(url);
+
+//     noteService
+//     .update(id, changedNote)
+//     .then(returnedNote => {
+//       setNotes(notes.map(note => note.id === id ? returnedNote : note))
+//       })
+//       .catch(error => {
+//         console.error('Error updating note importance', error)
+//       })
+
+//       console.log(`importance of ${id} needs to be toggled`)
+//   }
+
+//   const handleNoteChange = (event) => {
+//     setNewNote(event.target.value)
+//   }
+
+//   const notesToShow = showAll
+//     ? notes
+//     : notes.filter(note => note.important)
+    //         setNotes(notes.concat(returnedNote))
+
+//   return (
+//     <div>
+//       <h1>Notes</h1>
+//       <div>
+//         <button onClick={() => setShowAll(!showAll)}>
+//           show {showAll ? 'important' : 'all'}
+//         </button>
+//       </div>      
+//       <ul>
+//         {notesToShow.map(note => 
+//           <Note key={note.id} note={note} toggleImportance={() => toggleImportanceOf(note.id)} />
+//         )}
+//       </ul>
+//       <form onSubmit={addNote}>
+//         <input
+//           value={newNote}
+//           onChange={handleNoteChange}
+//         />
+//         <button type="submit">save</button>
+//       </form> 
+//     </div>
+//   )
+// } 
+
+
+// export default App
+
+
+
+// ------------------------------------------------------------------
+
 
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import PersonForm from './2.10/PersonForm'
 import Filter from './2.10/Filter'
 import Persons from './2.10/Persons'
+import personService from './services/persons'  // Import the persons service
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -12,7 +104,6 @@ const App = () => {
     newPhone: '',
     searchTerm: ''
   })
-
 
   const handleInputChange = (event) => {
     const { name, value } = event.target
@@ -35,24 +126,18 @@ const App = () => {
     } else {
       const newPerson = {
         name: formData.newName,
-        number: formData.newPhone,
-        id: persons.length + 1
+        number: formData.newPhone
       }
-      setPersons(persons.concat(newPerson))
-      setFormData({ ...formData, newName: '', newPhone: '' }) 
 
-
-        // POST request to save the new person to the server
-    axios
-    .post('http://localhost:3002/persons', newPerson)
-    .then(response => {
-      setPersons(persons.concat(response.data)); 
-      setFormData({ ...formData, newName: '', newPhone: '' });
-      console.log('Person added successfully', response.data);
-    })
-    .catch(error => {
-      console.error('Error adding person', error);
-    });
+      personService
+        .create(newPerson) // Use the service to create a new person
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setFormData({ ...formData, newName: '', newPhone: '' })
+        })
+        .catch(error => {
+          console.error('Error adding person', error)
+        })
     }
   }
 
@@ -61,18 +146,15 @@ const App = () => {
   )
 
   useEffect(() => {
-    console.log('Fetching data from the server')
-    axios
-      .get('http://localhost:3002/persons')
-      .then(response => {
-        console.log('Data fetched successfully', response.data)
-        setPersons(response.data) 
+    personService
+      .getAll() // Fetch all persons using the service
+      .then(initialPersons => {
+        setPersons(initialPersons)
       })
       .catch(error => {
-        console.error('Error fetching data', error)
+        console.error('Error fetching persons', error)
       })
-  }, []) 
-  
+  }, [])
 
   return (
     <div>
@@ -100,4 +182,5 @@ const App = () => {
 }
 
 export default App
+
 
