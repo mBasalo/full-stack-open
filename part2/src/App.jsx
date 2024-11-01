@@ -126,22 +126,38 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
-
-    const nameExists = persons.some(person => person.name === formData.newName)
-    const phoneExists = persons.some(person => person.number === formData.newPhone)
-
-    if (nameExists) {
-      alert(`${formData.newName} is already added to phonebook`)
-    } else if (phoneExists) {
-      alert(`Phone number ${formData.newPhone} is already added to phonebook`)
+  
+    const existingPerson = persons.find(person => person.name === formData.newName)
+  
+    if (existingPerson) {
+      // If person already exists, ask for confirmation to replace the number
+      const confirmUpdate = window.confirm(
+        `${formData.newName} is already added to the phonebook. Replace the old number with the new one?`
+      )
+      if (confirmUpdate) {
+        const updatedPerson = { ...existingPerson, number: formData.newPhone }
+  
+        personService
+          .update(existingPerson.id, updatedPerson) // Update existing person using PUT request
+          .then(returnedPerson => {
+            setPersons(persons.map(person =>
+              person.id !== existingPerson.id ? person : returnedPerson
+            ))
+            setFormData({ ...formData, newName: '', newPhone: '' })
+          })
+          .catch(error => {
+            console.error('Error updating person', error)
+          })
+      }
     } else {
+      // If person doesn't exist, add as a new entry
       const newPerson = {
         name: formData.newName,
         number: formData.newPhone
       }
-
+  
       personService
-        .create(newPerson) // Use the service to create a new person
+        .create(newPerson)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
           setFormData({ ...formData, newName: '', newPhone: '' })
@@ -151,6 +167,7 @@ const App = () => {
         })
     }
   }
+  
 
 
   const deletePerson = (id, name) => {
