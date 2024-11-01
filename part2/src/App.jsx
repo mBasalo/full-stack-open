@@ -98,125 +98,135 @@
 
 // ------------------------------------------------------------------
 
-  import { useState, useEffect } from 'react'
-  import PersonForm from './2.10/PersonForm'
-  import Filter from './2.10/Filter'
-  import Persons from './2.10/Persons'
-  import personService from './services/persons'
-  import Notification from './Components/Notification'
-  import './Styles/Styles.css'
-  
-  const App = () => {
-    const [persons, setPersons] = useState([])
-    const [formData, setFormData] = useState({
-      newName: '',
-      newPhone: '',
-      searchTerm: ''
+import { useState, useEffect } from 'react'
+import PersonForm from './2.10/PersonForm'
+import Filter from './2.10/Filter'
+import Persons from './2.10/Persons'
+import personService from './services/persons'  
+import Notification from './Components/Notification'
+import './Styles/Styles.css'
+
+const App = () => {
+  const [persons, setPersons] = useState([])
+  const [formData, setFormData] = useState({
+    newName: '',
+    newPhone: '',
+    searchTerm: ''
+  })
+
+  const [notification, setNotification] = useState({ message: null, type: null }) // Type will control the style
+
+
+  useEffect(() => {
+    personService
+      .getAll()
+      .then(initialPersons => {
+        setPersons(initialPersons)
+      })
+      .catch(error => {
+        console.error('Error fetching persons', error)
+      })
+  }, [])
+
+  const showNotification = (message, type) => {
+    setNotification({ message, type })
+    setTimeout(() => setNotification({ message: null, type: null }), 3000)
+  }
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target
+    setFormData({
+      ...formData,
+      [name]: value
     })
-    const [notification, setNotification] = useState(null)
-  
-    useEffect(() => {
+  }
+
+  const addOrUpdatePerson = (event) => {
+    event.preventDefault()
+    const existingPerson = persons.find(person => person.name === formData.newName)
+    
+    if (existingPerson) {
+      const confirmUpdate = window.confirm(`${formData.newName} is already in the phonebook. Replace the old number with a new one?`)
+      if (confirmUpdate) {
+        const updatedPerson = { ...existingPerson, number: formData.newPhone }
+        
+        personService
+          .update(existingPerson.id, updatedPerson)
+          .then(returnedPerson => {
+            setPersons(persons.map(person => person.id !== existingPerson.id ? person : returnedPerson))
+            showNotification(`Updated ${returnedPerson.name}'s number`, 'success')
+          })
+          .catch(error => {
+            if (error.response && error.response.status === 404) {
+              showNotification(`Information for ${existingPerson.name} has already been removed from the server`, 'error')
+              setPersons(persons.filter(person => person.id !== existingPerson.id)) // Remove from local state
+            } else {
+              console.error('Error updating person', error)
+            }
+          })
+      }
+    } else {
+      const newPerson = {
+        name: formData.newName,
+        number: formData.newPhone
+      }
+
       personService
-        .getAll()
-        .then(initialPersons => {
-          setPersons(initialPersons)
+        .create(newPerson)
+        .then(returnedPerson => {
+          setPersons(persons.concat(returnedPerson))
+          setFormData({ ...formData, newName: '', newPhone: '' })
+          showNotification(`Added ${returnedPerson.name}`, 'success')
         })
         .catch(error => {
-          console.error('Error fetching persons', error)
+          console.error('Error adding person', error)
         })
-    }, [])
-  
-    const showNotification = (message) => {
-      setNotification(message)
-      setTimeout(() => setNotification(null), 3000)
     }
-  
-    const handleInputChange = (event) => {
-      const { name, value } = event.target
-      setFormData({
-        ...formData,
-        [name]: value
+  }
+
+  const deletePerson = (id, name) => {
+    if (window.confirm(`Delete ${name}?`)) {
+      personService.remove(id).then(() => {
+        setPersons(persons.filter(person => person.id !== id))
+        showNotification(`Deleted ${name}`, 'success')
+      }).catch(error => {
+        console.error('Error deleting person', error)
       })
     }
-  
-    const addOrUpdatePerson = (event) => {
-      event.preventDefault()
-      const existingPerson = persons.find(person => person.name === formData.newName)
-  
-      if (existingPerson) {
-        const confirmUpdate = window.confirm(`${formData.newName} is already in the phonebook. Replace the old number with a new one?`)
-        if (confirmUpdate) {
-          const updatedPerson = { ...existingPerson, number: formData.newPhone }
-  
-          personService
-            .update(existingPerson.id, updatedPerson)
-            .then(returnedPerson => {
-              setPersons(persons.map(person => person.id !== existingPerson.id ? person : returnedPerson))
-              showNotification(`Updated ${returnedPerson.name}'s number`)
-            })
-            .catch(error => {
-              console.error('Error updating person', error)
-            })
-        }
-      } else {
-        const newPerson = {
-          name: formData.newName,
-          number: formData.newPhone
-        }
-  
-        personService
-          .create(newPerson)
-          .then(returnedPerson => {
-            setPersons(persons.concat(returnedPerson))
-            setFormData({ ...formData, newName: '', newPhone: '' })
-            showNotification(`Added ${returnedPerson.name}`)
-          })
-          .catch(error => {
-            console.error('Error adding person', error)
-          })
-      }
-    }
-  
-    const deletePerson = (id, name) => {
-      if (window.confirm(`Delete ${name}?`)) {
-        personService
-          .remove(id)
-          .then(() => {
-            setPersons(persons.filter(person => person.id !== id))
-            showNotification(`Deleted ${name}`)
-          })
-          .catch(error => {
-            console.error('Error deleting person', error)
-          })
-      }
-    }
-  
-    const personsToShow = persons.filter(person =>
-      person.name.toLowerCase().includes(formData.searchTerm.toLowerCase())
-    )
-  
-    return (
-      <div>
-        <h2>Phonebook</h2>
-        <Notification message={notification} />
-        <Filter
-          searchTerm={formData.searchTerm}
-          handleInputChange={handleInputChange}
-        />
-        <h3>Add a new person</h3>
-        <PersonForm
-          newName={formData.newName}
-          newPhone={formData.newPhone}
-          handleInputChange={handleInputChange}
-          addPerson={addOrUpdatePerson}
-        />
-        <h3>Numbers</h3>
-        <Persons persons={personsToShow} deletePerson={deletePerson} />
-      </div>
-    )
   }
-  
-  export default App
+
+  const personsToShow = persons.filter(person =>
+    person.name.toLowerCase().includes(formData.searchTerm.toLowerCase())
+  )
+
+  return (
+    <div>
+      <h2>Phonebook</h2>
+
+      <Notification message={notification.message} type={notification.type} />
+
+      <Filter
+        searchTerm={formData.searchTerm}
+        handleInputChange={handleInputChange}
+      />
+
+      <h3>Add a new person</h3>
+
+      <PersonForm
+        newName={formData.newName}
+        newPhone={formData.newPhone}
+        handleInputChange={handleInputChange}
+        addPerson={addOrUpdatePerson}
+      />
+
+      <h3>Numbers</h3>
+
+      <Persons persons={personsToShow} deletePerson={deletePerson} />
+    </div>
+  )
+}
+
+export default App
   
 
 

@@ -1,13 +1,12 @@
 // Components/Notification.js
-const Notification = ({ message }) => {
+const Notification = ({ message, type }) => {
     if (!message) return null
   
     return (
-      <div className="notification">
+      <div className={`notification ${type}`}>
         {message}
       </div>
     )
   }
   
-  export default Notification
-  
+  export default Notification  
