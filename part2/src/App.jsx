@@ -105,6 +105,17 @@ const App = () => {
     searchTerm: ''
   })
 
+  useEffect(() => {
+    personService
+      .getAll() // Fetch all persons using the service
+      .then(initialPersons => {
+        setPersons(initialPersons)
+      })
+      .catch(error => {
+        console.error('Error fetching persons', error)
+      })
+  }, [])
+
   const handleInputChange = (event) => {
     const { name, value } = event.target
     setFormData({
@@ -141,20 +152,22 @@ const App = () => {
     }
   }
 
+
+  const deletePerson = (id, name) => {
+    if (window.confirm(`Delete ${name}?`)) {
+      personService.remove(id).then(() => {
+        setPersons(persons.filter(person => person.id !== id))
+      }).catch(error => {
+        console.error('Error deleting person', error)
+      })
+    }
+  }
+
   const personsToShow = persons.filter(person =>
     person.name.toLowerCase().includes(formData.searchTerm.toLowerCase())
   )
 
-  useEffect(() => {
-    personService
-      .getAll() // Fetch all persons using the service
-      .then(initialPersons => {
-        setPersons(initialPersons)
-      })
-      .catch(error => {
-        console.error('Error fetching persons', error)
-      })
-  }, [])
+
 
   return (
     <div>
@@ -176,7 +189,7 @@ const App = () => {
 
       <h3>Numbers</h3>
 
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} deletePerson={deletePerson}  />
     </div>
   )
 }
