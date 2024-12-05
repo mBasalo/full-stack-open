@@ -10,6 +10,17 @@
 //   const [newNote, setNewNote] = useState('')
 //   const [showAll, setShowAll] = useState(false)
 //   const [errorMessage, setErrorMessage] = useState('some error happened...')
+  
+//   const baseUrl = 'http://localhost:3001/notes'
+
+
+
+  
+
+//   const getAll = () => {
+//     const request = axios.get(baseUrl)
+//     return request.then(response => response.data)
+//   }
 
 
 //   useEffect(() => {
@@ -95,14 +106,13 @@
 // export default App
 
 
-
 // ------------------------------------------------------------------
 
 import { useState, useEffect } from 'react'
 import PersonForm from './2.10/PersonForm'
 import Filter from './2.10/Filter'
 import Persons from './2.10/Persons'
-import personService from './services/persons'  
+import personService from './services/persons.js'  
 import Notification from './Components/Notification'
 import './Styles/Styles.css'
 
@@ -114,7 +124,7 @@ const App = () => {
     searchTerm: ''
   })
 
-  const [notification, setNotification] = useState({ message: null, type: null }) // Type will control the style
+  const [notification, setNotification] = useState({ message: null, type: null })
 
 
   useEffect(() => {
@@ -227,6 +237,3 @@ const App = () => {
 }
 
 export default App
-  
-
-
